@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor";
 import Split from "react-split";
-import { data } from "./data";
 import { nanoid } from "nanoid";
 import "./styles/App.scss";
 
@@ -65,7 +64,6 @@ export default function App() {
     setNotes((oldNotes) => oldNotes.filter((note) => note.id !== noteId));
   }
 
-  console.log(notes);
 
   function findCurrentNote() {
     return (
