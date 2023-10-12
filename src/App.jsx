@@ -12,6 +12,9 @@ export default function App() {
   const [currentNoteId, setCurrentNoteId] = React.useState("");
   const currentNote =
     notes.find((note) => note.id === currentNoteId) || notes[0];
+  const [tempNotes, setTempNotes] = React.useState("");
+
+  const sortedArray = notes.sort((a, b) => b.updatedAt - a.updatedAt);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(noteCollection, (snapshot) => {
@@ -21,7 +24,6 @@ export default function App() {
         id: doc.id,
       }));
       setNotes(notesArr);
-      // console.log(notesArr)
     });
     return unsubscribe;
   }, []);
@@ -31,6 +33,23 @@ export default function App() {
       setCurrentNoteId(notes[0]?.id);
     }
   }, [notes]);
+
+  React.useEffect(() => {
+    if (currentNote) {
+      setTempNotes(currentNote.body);
+    }
+  }, [currentNote]);
+
+  // Debouncing
+  React.useEffect(() => {
+    const timeID = setTimeout(() => {
+      if (tempNotes != currentNote.body) {
+      updateNote(tempNotes)
+      }
+    }, 500)
+    
+    return () => clearTimeout(timeID)
+  }, [tempNotes])
 
   async function createNewNote() {
     const newNote = {
@@ -58,13 +77,13 @@ export default function App() {
       {notes.length > 0 ? (
         <Split sizes={[30, 70]} direction="horizontal" className="split">
           <Sidebar
-            notes={notes}
+            notes={sortedArray}
             currentNote={currentNote}
             setCurrentNoteId={setCurrentNoteId}
             newNote={createNewNote}
             deleteNote={deleteNote}
           />
-          <Editor currentNote={currentNote} updateNote={updateNote} />
+          <Editor tempNotes={tempNotes} setTempNotes={setTempNotes} />
         </Split>
       ) : (
         <div className="no-notes">
